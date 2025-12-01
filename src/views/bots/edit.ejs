@@ -1,0 +1,46 @@
+<h1>Editar Bot</h1>
+<a href="/bots">Volver a la lista</a>
+
+<form action="/bots/<%= bot._id %>/edit" method="POST">
+    <div>
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" value="<%= bot.name %>" required>
+    </div>
+
+    <div>
+        <label for="configuration">Configuración (JSON):</label>
+        <textarea id="configuration" name="configuration"
+            rows="5"><%= JSON.stringify(bot.configuration, null, 2) %></textarea>
+    </div>
+
+    <div>
+        <label for="channel">Canal:</label>
+        <select id="channel" name="channel" required>
+            <option value="">-- Selecciona un canal --</option>
+            <% channels.forEach(c=> { %>
+                <option value="<%= c._id %>" <%=bot.channel?.toString()===c._id.toString() ? "selected" : "" %>><%=
+                        c.name %>
+                </option>
+                <% }) %>
+        </select>
+    </div>
+
+    <div>
+        <label for="businesses">Empresas:</label>
+        <select id="businesses" name="businesses" multiple required>
+            <% businesses.forEach(b=> { %>
+                <option value="<%= b._id %>" <%=bot.businesses.map(x=> x.toString()).includes(b._id.toString()) ?
+                    "selected" : "" %>><%= b.name %>
+                </option>
+                <% }) %>
+        </select>
+        <small>Para seleccionar varias empresas, mantén presionada la tecla Ctrl o Cmd.</small>
+    </div>
+
+    <div>
+        <label for="active">Activo:</label>
+        <input type="checkbox" id="active" name="active" <%=bot.active ? "checked" : "" %>>
+    </div>
+
+    <button type="submit">Actualizar Bot</button>
+</form>

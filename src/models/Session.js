@@ -1,0 +1,10 @@
+import mongoose from "mongoose";
+
+const SessionSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    sessionToken: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+export default mongoose.model("Session", SessionSchema);

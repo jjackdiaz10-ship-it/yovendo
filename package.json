@@ -1,0 +1,40 @@
+{
+  "name": "yovendo.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "verify-auth": "node src/scripts/verify-auth.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "admin-lte": "^4.0.0-rc4",
+    "bcryptjs": "^3.0.3",
+    "bootstrap": "^5.3.8",
+    "chalk": "^5.6.2",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.2",
+    "jquery": "^3.7.1",
+    "mongoose": "^9.0.0",
+    "openai": "^6.9.1",
+    "qrcode-terminal": "^0.12.0",
+    "twilio": "^5.10.6",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

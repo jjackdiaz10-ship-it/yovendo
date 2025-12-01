@@ -1,0 +1,46 @@
+<div class="container mt-4">
+    <form action="<%= channel ? '/channels/' + channel._id + '/edit' : '/channels/create' %>" method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" id="name" name="name" class="form-control" required value="<%= channel?.name || '' %>">
+        </div>
+
+        <div class="mb-3">
+            <label for="type" class="form-label">Tipo</label>
+            <select id="type" name="type" class="form-select" required>
+                <option value="">-- Selecciona tipo --</option>
+                <option value="ecommerce" <%=channel?.type==='ecommerce' ? 'selected' : '' %>>Ecommerce</option>
+                <option value="whatsapp" <%=channel?.type==='whatsapp' ? 'selected' : '' %>>WhatsApp</option>
+                <option value="instagram" <%=channel?.type==='instagram' ? 'selected' : '' %>>Instagram</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="configuration" class="form-label">Configuración (JSON)</label>
+            <textarea id="configuration" name="configuration" rows="5"
+                class="form-control"><%= channel ? JSON.stringify(channel.configuration, null, 2) : '{}' %></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="businesses" class="form-label">Empresas</label>
+            <select id="businesses" name="businesses" class="form-select" multiple required>
+                <% businesses.forEach(b=> { %>
+                    <option value="<%= b._id %>" <%=channel?.businesses?.includes(b._id) ? 'selected' : '' %>><%= b.name
+                            %>
+                    </option>
+                    <% }) %>
+            </select>
+            <small class="text-muted">Mantén Ctrl o Cmd para seleccionar varias empresas</small>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" id="active" name="active" class="form-check-input" <%=channel?.active ? 'checked'
+                : '' %>>
+            <label for="active" class="form-check-label">Activo</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <%= channel ? "Actualizar" : "Crear" %> Canal
+        </button>
+    </form>
+</div>

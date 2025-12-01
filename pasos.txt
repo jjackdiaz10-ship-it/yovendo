@@ -1,0 +1,72 @@
+CRUD de canales (WhatsApp, IG, etc.)
+Vista de conversaciones tipo “inbox” con mensajes
+Widget de chat (webchat) para copiar y pegar en cualquier sitio
+Integración de IA (OpenAI)
+Login + permisos del panel
+Sistema de FAQs con IA híbrida
+
+2FA / Email confirmation: añade verificación de correo si requiere producción.
+Protege endpoints sensibles con requirePermission.
+
+
+1️⃣ Arquitectura general del admin
+Usuarios y Empresas
+Cada empresa tiene su propia cuenta/espacio dentro del sistema.
+Roles internos por empresa: Admin, Atención al Cliente, Marketing.
+Cada empresa puede configurar sus propios canales de ventas.
+Canales
+Cada empresa puede conectar múltiples canales:
+Ecommerce → Shopify, WooCommerce, Prestashop, etc.
+Sincroniza productos, stock y pedidos.
+Permite automatizar respuestas sobre productos, stock o carrito abandonado.
+WhatsApp → Número Business API o Twilio.
+El bot responde consultas, recomienda productos, confirma ventas.
+Otros canales futuros → Instagram, Messenger, Telegram, según crezca la plataforma.
+Bots
+Cada empresa tiene bots configurables que operan sobre los canales.
+Funcionalidades:
+Respuestas automáticas a preguntas frecuentes (FAQ).
+Asistente de ventas → guiar al cliente hasta cerrar el pedido.
+Seguimiento de carrito → recordatorios por WhatsApp.
+Upsell/Cross-sell → sugerencias de productos adicionales.
+
+2️⃣ Módulos del Admin
+Dashboard
+Resumen de ventas, conversaciones, clientes nuevos.
+KPIs clave por canal.
+Estado de los bots.
+Canales
+Panel de configuración de cada canal conectado.
+Estado de la conexión.
+Opciones de integración (API keys, webhooks).
+Conversaciones
+Inbox centralizado para todos los mensajes que llegan por los canales.
+Filtros por estado: pendientes, en proceso, cerradas.
+Etiquetas: venta cerrada, seguimiento, pregunta general.
+Pedidos / Ventas
+Pedidos generados desde ecommerce o WhatsApp.
+Estado de cada pedido: pendiente, confirmado, entregado.
+Vinculación con la conversación que lo generó.
+Clientes / Usuarios
+Perfil de clientes: historial de compras y conversaciones.
+Segmentación para campañas de marketing.
+Marketing
+Automatización de mensajes de venta o promoción.
+Campañas segmentadas según comportamiento del cliente.
+Configuración
+Ajustes por empresa: nombre, logo, usuarios internos, roles.
+Preferencias generales de los bots.
+
+3️⃣ Flujo de uso típico para una empresa
+Empresa se registra y crea su cuenta en la plataforma.
+Conecta sus canales:
+Integra su ecommerce.
+Vincula su WhatsApp Business.
+Configura el bot:
+Respuestas automáticas.
+Mensajes de venta o seguimiento de carrito.
+Empieza a recibir clientes:
+Los mensajes entran al módulo de Conversaciones.
+El bot ayuda a cerrar ventas automáticamente.
+Las ventas quedan registradas en Pedidos/Ventas.
+Puede monitorear KPIs en Dashboard y ajustar estrategias en Marketing.

@@ -1,0 +1,26 @@
+<%- include('layout', { title: 'Panel | Dashboard' , body: ` <h1 class="mb-4">Dashboard</h1>
+    <div class="card-body">
+        <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+                <form action="/auth/register-company" method="POST">
+                    <h5>Datos de la empresa</h5>
+                    <div class="input-group mb-3"> <input type="text" name="companyName" class="form-control"
+                            placeholder="Nombre empresa" required> </div>
+                    <div class="input-group mb-3"> <input type="text" name="companySlug" class="form-control"
+                            placeholder="Slug (empresa-url)" required> </div>
+                    <hr>
+                    <h5>Administrador inicial</h5>
+                    <div class="input-group mb-3"> <input type="text" name="adminName" class="form-control"
+                            placeholder="Nombre administrador" required> </div>
+                    <div class="input-group mb-3"> <input type="email" name="adminEmail" class="form-control"
+                            placeholder="Correo admin" required> </div>
+                    <div class="input-group mb-3"> <input type="password" name="adminPassword" class="form-control"
+                            placeholder="Contraseña" required> </div> <button class="btn btn-success btn-block">Crear
+                        Empresa</button>
+                </form>
+    </div>
+    `
+    }); %>

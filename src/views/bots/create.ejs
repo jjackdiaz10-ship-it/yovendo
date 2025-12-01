@@ -1,0 +1,63 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Crear Bot</h3>
+                </div>
+                <div class="card-body">
+                    <a href="/bots" class="btn btn-outline-secondary mb-4">
+                        <i class="bi bi-arrow-left"></i> Volver a la lista
+                    </a>
+
+                    <form action="/bots/create" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre del Bot:</label>
+                            <input type="text" class="form-control" id="name" name="name" required
+                                placeholder="Ej. Bot de Ventas">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="configuration" class="form-label">Configuración (JSON):</label>
+                            <textarea id="configuration" name="configuration" class="form-control"
+                                rows="5">{}</textarea>
+                            <div class="form-text">Agrega la configuración del bot en formato JSON.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="channel" class="form-label">Canal:</label>
+                            <select id="channel" name="channel" class="form-select" required>
+                                <option value="">-- Selecciona un canal --</option>
+                                <% channels.forEach(c=> { %>
+                                    <option value="<%= c._id %>">
+                                        <%= c.name %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="businesses" class="form-label">Empresas:</label>
+                            <select id="businesses" name="businesses" class="form-select" multiple required>
+                                <% businesses.forEach(b=> { %>
+                                    <option value="<%= b._id %>">
+                                        <%= b.name %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                            <small class="form-text text-muted">
+                                Para seleccionar varias empresas, mantén presionada la tecla Ctrl o Cmd.
+                            </small>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-robot"></i> Crear Bot
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

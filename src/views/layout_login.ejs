@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title || "Login" %>
+    </title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --gh-bg: #0d1117;
+            --gh-card: #161b22;
+            --gh-border: #30363d;
+            --gh-text: #c9d1d9;
+            --gh-primary: #58a6ff;
+        }
+
+        body {
+            background-color: var(--gh-bg);
+            color: var(--gh-text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        #animation-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        .login-card {
+            background-color: var(--gh-card);
+            border: 1px solid var(--gh-border);
+            max-width: 520px;
+            width: 100%;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-gh {
+            background-color: transparent;
+            border: 1px solid var(--gh-border);
+            color: var(--gh-text);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        .input-gh:focus {
+            outline: none;
+            border-color: var(--gh-primary);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        .btn-gh-primary {
+            background-color: #238636;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        .btn-gh-primary:hover {
+            background-color: #2ea043;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <!-- Fondo animado -->
+    <canvas id="animation-canvas"></canvas>
+
+    <!-- Contenido (posición sobre el canvas) -->
+    <div class="relative z-10 w-full max-w-md">
+        <%- body %>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const canvas = document.getElementById('animation-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let width, height;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = 1;
+                this.color = 'rgba(88, 166, 255, 0.8)';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(13, 17, 23, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = p.x - particles[j].x;
+                    const dy = p.y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(48,54,61,${(1 - dist / 100) * 0.5})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const num = Math.floor((width * height) / 15000);
+            for (let i = 0; i < num; i++) particles.push(new Particle());
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', init);
+        window.onload = init;
+    </script>
+
+</body>
+
+</html>

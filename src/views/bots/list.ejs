@@ -1,0 +1,68 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0"></h2>
+        <a href="/bots/create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Crear nuevo bot
+        </a>
+    </div>
+
+    <% if (bots.length> 0) { %>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Canal</th>
+                        <th>Empresas</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bots.forEach(bot=> { %>
+                        <tr>
+                            <td>
+                                <%= bot.name %>
+                            </td>
+                            <td>
+                                <%= bot.channel?.name || "-" %>
+                            </td>
+                            <td>
+                                <% bot.businesses.forEach((b, index)=> { %>
+                                    <%= b.name %>
+                                        <%= index < bot.businesses.length - 1 ? ", " : "" %>
+                                            <% }) %>
+                            </td>
+                            <td>
+                                <% if (bot.active) { %>
+                                    <span class="badge bg-success">Sí</span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">No</span>
+                                        <% } %>
+                            </td>
+                            <td>
+                                <a href="/bots/<%= bot._id %>/edit" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <form action="/bots/<%= bot._id %>/delete" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <% } else { %>
+            <div class="text-center py-5">
+                <i class="bi bi-robot" style="font-size: 4rem; color: #6c757d;"></i>
+                <h4 class="mt-3 text-muted">No tienes bots creados todavía</h4>
+                <p class="text-muted">Crea tu primer bot y empieza a automatizar tus canales de ventas.</p>
+                <a href="/bots/create" class="btn btn-primary mt-2">
+                    <i class="bi bi-plus-lg"></i> Crear Bot
+                </a>
+            </div>
+            <% } %>
+</div>

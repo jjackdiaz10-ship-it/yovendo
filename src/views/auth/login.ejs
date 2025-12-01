@@ -1,0 +1,51 @@
+<%- include('../layout_login', { title: "Login" , body: ` <div class="text-center mb-6">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-white">
+        <path d="M12 2a9 9 0 0 0-9 9c0 1.93 1.05 3.65 2.65 4.54l-1.65 2.76A1 
+                    1 0 0 0 5 21h14a1 1 0 0 0 .97-1.2l-1.65-2.76c1.6-0.89 
+                    2.65-2.61 2.65-4.54a9 9 0 0 0-9-9z"></path>
+        <path d="M9 12h.01"></path>
+        <path d="M15 12h.01"></path>
+    </svg>
+    <h1 class="text-3xl font-bold text-white">Yovendo Admin</h1>
+    </div>
+
+    <div class="login-card">
+
+        <h3 class="text-xl font-semibold mb-6 text-center text-white">Ingresar al Panel</h3>
+
+        ${error ? `
+        <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-2 rounded mb-4 text-sm">
+            ${error}
+        </div>
+        ` : ''}
+
+        <form action="/auth/login" method="POST" class="space-y-4">
+
+            <div>
+                <label class="block text-sm mb-1">Correo Electrónico</label>
+                <div class="relative">
+                    <input type="email" name="email" class="input-gh pr-10" required>
+                    <i data-lucide="mail" class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500"></i>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm mb-1">Contraseña</label>
+                <div class="relative">
+                    <input type="password" name="password" class="input-gh pr-10" required>
+                    <i data-lucide="lock" class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-gh-primary mt-6">Ingresar</button>
+        </form>
+
+        <div class="mt-6 text-center text-sm">
+            <a href="#" class="text-gray-500 hover:text-white">¿Olvidaste tu contraseña?</a>
+        </div>
+
+    </div>
+
+    `
+    }) %>
