@@ -7,7 +7,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
 export const showLogin = (req, res) => {
-    res.render("auth/login", { layout: false, error: null });
+    res.render("auth/login", { layout: false, error: null, pageTitle: 'Login', });
 };
 
 export const postLogin = async (req, res) => {
@@ -19,13 +19,13 @@ export const postLogin = async (req, res) => {
 
 
         if (!user) {
-            return res.render("auth/login", { error: "Credenciales inválidas" });
+            return res.render("auth/login", { layout: false, error: "Credenciales inválidas", pageTitle: 'Login', });
         }
 
         // Comparar contraseña
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) {
-            return res.render("auth/login", { error: "Credenciales inválidas" });
+            return res.render("auth/login", { layout: false, error: "Credenciales inválidas", pageTitle: 'Login', });
         }
 
         // Guardar sesión
@@ -40,14 +40,14 @@ export const postLogin = async (req, res) => {
         console.log(req.session.user);
         return res.redirect("/");
     } catch (error) {
-        console.log("Login error:");
-        return res.render("auth/login", { error: "Error interno" });
+        console.log("Login error:", error);
+        return res.render("auth/login", { layout: false, error: "Error interno", pageTitle: 'Login', });
     }
 };
 
 export const logout = (req, res) => { req.session.destroy(() => { res.redirect("/auth/login"); }); };
 
-export const showRegisterCompany = (req, res) => { res.render("auth/register_company", { layout: false, error: null }); };
+export const showRegisterCompany = (req, res) => { res.render("auth/register_company", { layout: false, error: null, pageTitle: 'Register Company' }); };
 
 export const postRegisterCompany = async (req, res) => {
     try {
@@ -84,7 +84,7 @@ export const postRegisterCompany = async (req, res) => {
 
     } catch (error) {
         console.error("Register error:", error);
-        return res.render("auth/register_company", { error: "Error creando empresa" });
+        return res.render("auth/register_company", { layout: false, error: "Error creando empresa", pageTitle: 'Register Company' });
     }
 };
 
