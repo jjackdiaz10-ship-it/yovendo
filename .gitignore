@@ -1,0 +1,58 @@
+# ============================
+# Node.js
+# ============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+.cache/
+
+# ============================
+# Env vars / secrets
+# ============================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Evitar subir API keys y tokens accidentalmente
+*.key
+*.pem
+*.cert
+
+# ============================
+# Sesiones local del chatbot
+# ============================
+/src/storage/sessions/*.json
+/src/storage/sessions/**/*.json
+
+# ============================
+# Logs
+# ============================
+logs/
+*.log
+*.log.*
+debug.log
+
+# ============================
+# OS files
+# ============================
+.DS_Store
+Thumbs.db
+
+# ============================
+# Editor configs
+# ============================
+.vscode/
+.idea/
+*.swp
+
+# ============================
+# Misc
+# ============================
+*.tmp
+*.temp

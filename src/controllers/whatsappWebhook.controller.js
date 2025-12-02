@@ -1,6 +1,7 @@
 // src/controllers/whatsappWebhook.controller.js
 
 import { sendWhatsAppText } from "../services/whatsappApi.service.js";
+import { generateAIResponse } from "../services/aiService.js";
 import Message from "../models/Message.js";
 
 /* ============================================================
@@ -36,6 +37,8 @@ export async function receiveMessage(req, res) {
         const msgId = msg.id;
 
         console.log("📩 Mensaje recibido:", from, text);
+        const aiReply = await generateAIResponse(from, text);
+        console.log("🤖 IA respondió:", aiReply);
 
         // Guardar mensaje entrante
         await Message.create({
@@ -45,8 +48,7 @@ export async function receiveMessage(req, res) {
             direction: "in"
         });
 
-        // RESPONDER AL MISMO NÚMERO DEL CLIENTE
-        await sendWhatsAppText(from, "Hola 👋 gracias por tu mensaje, ¿en qué puedo ayudarte?");
+        //await sendWhatsAppText(from, aiReply);
 
         return res.sendStatus(200);
 
