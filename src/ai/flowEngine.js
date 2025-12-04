@@ -1,141 +1,124 @@
 // src/ai/flowEngine.js
+import Product from "../models/Product.js";
 
-export function flowEngine(session, message) {
+export async function flowEngine(session, message) {
     const text = message.toLowerCase();
-    const state = session.state || "saludo";
 
-    // === INTENCIONES ===
-    const intents = {
-        greeting: /(hola|buenas|qué tal|como estas|hey)/i.test(text),
-        wantsCatalog: /(catalogo|catálogo|ver productos|productos)/i.test(text),
-        wantsPrice: /(precio|cuánto vale|cuanto cuesta)/i.test(text),
-        wantsBuy: /(comprar|quiero uno|lo llevo|me interesa|lo quiero)/i.test(text),
-        wantsPay: /(pagar|link de pago|cómo pago|pago)/i.test(text),
-        compare: /(comparar|diferencia|vs|cual es mejor)/i.test(text)
-    };
+    if (!session.state) session.state = "saludo";
+    if (!session.cart) session.cart = {};
 
-    // === PRODUCTOS (Placeholder hasta que uses BD) ===
-    const productos = {
-        celulares: ["iPhone 13", "Samsung S22", "Xiaomi Redmi Note 12"],
-        audifonos: ["Sony WH-1000XM4", "AirPods Pro", "JBL 760NC"],
-        notebooks: ["Macbook Air M1", "Lenovo Thinkpad X1", "Asus VivoBook"]
-    };
+    const wantsYes = /(si|sí|ok|vale|claro|ya|dale)/i.test(text);
+    const wantsNo = /(no|nah|nop)/i.test(text);
 
-    function mostrarProductos() {
-        return `
-Perfecto 😎 Mira lo que tengo disponible:
+    // ==============================================
+    //   OBTENER CATEGORÍAS DESDE PRODUCTOS
+    // ==============================================
+    const allProducts = await Product.find().lean();
 
-📱 *Celulares*
-- ${productos.celulares.join("\n- ")}
+    // si no tienes campo category, lo inferimos por nombre temporalmente
+    const productosPorCategoria = {};
 
-🎧 *Audífonos*
-- ${productos.audifonos.join("\n- ")}
-
-💻 *Notebooks*
-- ${productos.notebooks.join("\n- ")}
-
-¿De qué categoría quieres saber más?
-        `;
+    for (const p of allProducts) {
+        const categoria = p.category ?? "general";
+        if (!productosPorCategoria[categoria]) productosPorCategoria[categoria] = [];
+        productosPorCategoria[categoria].push(p);
     }
 
-    // ==========================================
-    //                ESTADOS
-    // ==========================================
-    switch (state) {
+    const categorias = Object.keys(productosPorCategoria);
 
-        // -------------------------------------------------------
+    // ==============================================
+    //                FLUJO
+    // ==============================================
+    switch (session.state) {
+
         case "saludo":
-            session.state = "identificar_necesidad";
-            return "¡Hola! 👋 Soy tu asesor virtual. ¿Qué estás buscando hoy? (celulares, audífonos, notebooks…)";
+            session.state = "necesidad";
+            return `Hola 😊 ¿Qué estás buscando hoy?\nCategorías disponibles: ${categorias.join(", ")}`;
 
-        // -------------------------------------------------------
-        case "identificar_necesidad":
-            if (intents.wantsCatalog) {
-                session.state = "mostrar_catalogo";
-                return mostrarProductos();
+        case "necesidad": {
+            const categoria = categorias.find(c => text.includes(c.toLowerCase()));
+
+            if (categoria) {
+                session.category = categoria;
+                session.state = "producto_lista";
+
+                const lista = productosPorCategoria[categoria]
+                    .map(p => `- ${p.name} (${p.price.toLocaleString("es-CL")} CLP)`)
+                    .join("\n");
+
+                return `Perfecto. Tengo disponibles:\n${lista}\n¿Cuál te interesa?`;
             }
 
-            // Detectar categoría directa
-            for (let categoria in productos) {
-                if (text.includes(categoria)) {
-                    session.state = "recomendar_productos";
-                    session.category = categoria;
+            return `¿Qué categoría te interesa? (${categorias.join(", ")})`;
+        }
 
-                    return `Genial 😄 En *${categoria}* te recomiendo estos modelos:  
-- ${productos[categoria].join("\n- ")}  
-¿Cuál te interesa más?`;
-                }
+        case "producto_lista": {
+            const all = allProducts;
+
+            // buscar coincidencia por nombre
+            const productoObj = all.find(p =>
+                text.includes(p.name.toLowerCase())
+            );
+
+            if (productoObj) {
+                session.cart.producto = productoObj.name;
+                session.cart.precio = productoObj.price;
+                session.cart.id = productoObj._id;
+
+                session.state = "confirmar_detalle";
+
+                return `Perfecto. Ese modelo cuesta ${productoObj.price.toLocaleString("es-CL")} CLP.\n¿Deseas agregar color, modelo o alguna variante?`;
             }
 
-            return "Entiendo 👍 ¿Estás buscando celulares, audífonos, notebooks o algo más?";
-
-        // -------------------------------------------------------
-        case "mostrar_catalogo":
-            session.state = "recomendar_productos";
-            return mostrarProductos();
-
-        // -------------------------------------------------------
-        case "recomendar_productos":
-            // Selección directa de producto
-            const productoEncontrado = Object.values(productos).flat()
-                .find(p => text.includes(p.toLowerCase()));
-
-            if (productoEncontrado) {
-                session.cart.producto = productoEncontrado;
-                session.state = "confirmar_detalles";
-                return `Excelente elección 😍 El *${productoEncontrado}* es uno de los favoritos.\n\n¿Lo quieres en algún color o variante en particular?`;
-            }
-
-            // Si escribió algo que parece producto
+            // fallback: texto libre
             if (message.length < 40) {
                 session.cart.producto = message;
-                session.state = "confirmar_detalles";
-                return `Perfecto, hablemos de *${message}* 😎\n¿Lo quieres en algún color o variante?`;
+                session.cart.precio = 0;
+
+                session.state = "confirmar_detalle";
+                return `Anotado. ¿Quieres agregar algún detalle adicional?`;
             }
 
-            return "Perfecto ¿qué modelo te interesa ver más en detalle?";
+            return "Indícame el modelo que te interesa.";
+        }
 
-        // -------------------------------------------------------
-        case "confirmar_detalles":
+        case "confirmar_detalle":
             session.cart.detalles = message;
-            session.state = "cierre_venta";
-            return `
-Perfecto 🙌 Ya tengo todo lo necesario:
 
-🛒 Producto: ${session.cart.producto}
-✨ Detalles: ${session.cart.detalles}
+            session.state = "confirmar_compra";
 
-¿Deseas confirmar la compra?
-            `;
+            const precio = session.cart.precio
+                ? `${session.cart.precio.toLocaleString("es-CL")} CLP`
+                : "por confirmar";
 
-        // -------------------------------------------------------
-        case "cierre_venta":
-            if (intents.wantsPay || intents.wantsBuy) {
+            return `Listo 👍\nProducto: ${session.cart.producto}\nPrecio: ${precio}\n¿Confirmamos la compra?`;
 
-                session.state = "post_venta";
+        case "confirmar_compra":
+            if (wantsYes) {
+                session.state = "pago";
 
-                const paymentUrl =
-                    `https://tusitio.com/pagar?producto=${encodeURIComponent(session.cart.producto)}&detalles=${encodeURIComponent(session.cart.detalles)}`;
+                const total = session.cart.precio || 0;
+                const url = `https://tusitio.com/pagar?producto=${encodeURIComponent(session.cart.producto)}&monto=${total}`;
 
-                return `
-¡Excelente decisión! 🎉
-
-Aquí tienes tu link de pago seguro:
-👉 ${paymentUrl}
-
-Apenas completes el pago te confirmo por aquí 😊
-                `;
+                return `¡Perfecto! 🎉\nTotal a pagar: ${total.toLocaleString("es-CL")} CLP.\nAquí tienes tu link de pago:\n${url}`;
             }
 
-            return "¿Deseas proceder al pago y asegurar tu producto? 😄";
+            if (wantsNo) {
+                session.state = "necesidad";
+                return "Sin problema. ¿Buscas otra cosa?";
+            }
 
-        // -------------------------------------------------------
+            return "¿Deseas confirmar la compra?";
+
+        case "pago":
+            session.state = "post_venta";
+            return "Gracias por tu compra 😊 Si necesitas algo más, aquí estoy.";
+
         case "post_venta":
-            return "¡Gracias por tu compra! 🥳 Si necesitas algo más aquí estoy.";
+            return "¿Puedo ayudarte en algo más?";
 
-        // -------------------------------------------------------
         default:
             session.state = "saludo";
-            return "¡Hola! ¿En qué te puedo ayudar hoy?";
+            return "Hola, ¿en qué te puedo ayudar?";
     }
 }

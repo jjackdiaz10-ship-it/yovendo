@@ -1,0 +1,71 @@
+<div class="container mt-4">
+    <h1>
+        <%= product ? "Editar Producto" : "Crear Producto" %>
+    </h1>
+
+    <form action="<%= product ? '/products/edit/' + product._id : '/products/create' %>" method="POST">
+
+        <!-- Nombre -->
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="name" class="form-control" value="<%= product ? product.name : '' %>" required>
+        </div>
+
+        <!-- SKU -->
+        <div class="mb-3">
+            <label class="form-label">SKU</label>
+            <input type="text" name="sku" class="form-control" value="<%= product ? product.sku : '' %>">
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="description" class="form-control"
+                rows="3"><%= product ? product.description : '' %></textarea>
+        </div>
+
+        <!-- Precio -->
+        <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <input type="number" name="price" class="form-control" step="0.01"
+                value="<%= product ? product.price : '' %>" required>
+        </div>
+
+        <!-- Stock -->
+        <div class="mb-3">
+            <label class="form-label">Stock</label>
+            <input type="number" name="stock" class="form-control" value="<%= product ? product.stock : 0 %>">
+        </div>
+
+        <!-- Imagen (URL simple por ahora) -->
+        <div class="mb-3">
+            <label class="form-label">Imagen (URL)</label>
+            <input type="text" name="image" class="form-control" value="<%= product ? product.image : '' %>">
+        </div>
+
+        <!-- Negocio -->
+        <div class="mb-3">
+            <label class="form-label">Negocio</label>
+            <select name="business" class="form-select">
+                <option value="">— Seleccionar —</option>
+
+                <% businesses.forEach(b=> { %>
+                    <option value="<%= b._id %>" <%=product && product.business?.toString()===b._id.toString()
+                        ? "selected" : "" %>
+                        >
+                        <%= b.name %>
+                    </option>
+                    <% }) %>
+            </select>
+        </div>
+
+        <!-- Botón -->
+        <div class="text-end mt-3">
+            <a href="/products" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-success">
+                <%= product ? "Guardar Cambios" : "Crear" %>
+            </button>
+        </div>
+
+    </form>
+</div>

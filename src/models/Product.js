@@ -7,8 +7,7 @@ const ProductSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 },
     image: String,
-    business: { type: mongoose.Schema.Types.ObjectId, ref: "Business" },
-    originChannel: { type: mongoose.Schema.Types.ObjectId, ref: "Channel" }
+    business: { type: mongoose.Schema.Types.ObjectId, ref: "Business" }
 }, { timestamps: true });
 
 export default mongoose.model("Product", ProductSchema);

@@ -4,45 +4,42 @@ import { flowEngine } from "../ai/flowEngine.js";
 import { loadSession, saveSession } from "../storage/sessions/sessionStorage.js";
 
 export async function generateAIResponse(phone, message) {
-    // 1. Cargar sesión
     const session = loadSession(phone);
 
-    // 2. Guardar mensaje del usuario en historial
-    session.history.push({
-        role: "user",
-        content: message
-    });
+    // historial
+    session.history.push({ role: "user", content: message });
 
-    // 3. Procesar flujo conversacional (flowEngine siempre decide el estado)
+    // flujo principal
     const flowReply = flowEngine(session, message);
 
-    // 4. Mejorar el texto usando tu LLM (opcional pero recomendado)
+    // optimización por IA, pero controlada
     let improvedReply = flowReply;
     try {
         improvedReply = await askGroq(`
-Mejora este texto para WhatsApp manteniendo la intención, tono vendedor amable
-y sin inventar datos ni productos nuevos:
-"${flowReply}"
-        `);
+Pulir texto para WhatsApp. Reglas:
+- Mantén la intención EXACTA del mensaje.
+- No agregues ofertas, ventas adicionales ni recomendaciones nuevas.
+- No cambies el flujo conversacional.
+- Evita emojis excepto máximo 1 por mensaje.
+- Manténlo corto, amable y directo.
+- NO inventes productos, detalles ni precios.
 
-        // En caso de que Groq responda vacío o raro:
-        if (!improvedReply || improvedReply.length < 2) {
+Texto:
+"${flowReply}"
+
+Devuelve SOLO el texto pulido.
+        `).catch(() => flowReply);
+
+        if (!improvedReply || improvedReply.trim().length < 2) {
             improvedReply = flowReply;
         }
-    } catch (err) {
-        console.error("Error mejorando respuesta con Groq:", err);
+    } catch {
         improvedReply = flowReply;
     }
 
-    // 5. Guardar respuesta final en el historial
-    session.history.push({
-        role: "assistant",
-        content: improvedReply
-    });
-
-    // 6. Guardar sesión
+    // guardar en historial
+    session.history.push({ role: "assistant", content: improvedReply });
     saveSession(phone, session);
 
-    // 7. Respuesta final que se envía al usuario
     return improvedReply;
 }

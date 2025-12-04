@@ -5,7 +5,8 @@ const ChannelSchema = new mongoose.Schema({
     name: { type: String, required: true },
     configuration: { type: Object },
     active: { type: Boolean, default: true },
-    businesses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Business" }]
+    businesses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Business" }],
+    webhook: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model("Channel", ChannelSchema);

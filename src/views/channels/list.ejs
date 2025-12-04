@@ -15,6 +15,7 @@
                         <th>Tipo</th>
                         <th>Empresas</th>
                         <th>Activo</th>
+                        <th>Webhook</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -39,6 +40,9 @@
                                     <% } else { %>
                                         <span class="badge bg-secondary">No</span>
                                         <% } %>
+                            </td>
+                            <td>
+                                <%= ch.webhook %>
                             </td>
                             <td>
                                 <a href="/channels/<%= ch._id %>/edit" class="btn btn-sm btn-warning me-1">

@@ -4,8 +4,8 @@ import { verifyWebhook, receiveMessage, sendMessage } from "../controllers/whats
 
 const router = express.Router();
 
-router.get("/webhook", verifyWebhook);
-router.post("/webhook", receiveMessage);
+router.post("/webhook/:code-:businessId", receiveMessage);
+router.get("/webhook/:code-:businessId", verifyWebhook);
 router.post("/send", sendMessage);
 
 export default router;

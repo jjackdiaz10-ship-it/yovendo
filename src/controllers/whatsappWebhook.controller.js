@@ -24,6 +24,10 @@ export function verifyWebhook(req, res) {
    ============================================================ */
 export async function receiveMessage(req, res) {
     try {
+
+        const { code, businessId } = req.params;
+        console.log("Webhook recibido para business:", businessId, "con código:", code);
+
         const entry = req.body.entry?.[0];
         const changes = entry?.changes?.[0];
         const messages = changes?.value?.messages;
@@ -64,7 +68,6 @@ export async function receiveMessage(req, res) {
    ============================================================ */
 export async function sendMessage(req, res) {
     try {
-        console.log("HOLAAAAAAAAAAA");
         const { to, message } = req.body;
 
         if (!to || !message) {

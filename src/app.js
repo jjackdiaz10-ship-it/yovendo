@@ -78,6 +78,7 @@ import homeRoutes from "./routes/home.routes.js";
 import botRoutes from "./routes/bot.routes.js";
 import channelRoutes from "./routes/channel.routes.js";
 import businessRoutes from "./routes/business.routes.js";
+import productRoutes from "./routes/product.routes.js";
 import whatsappRoutes from "./routes/whatsapp.routes.js";
 
 app.use("/", homeRoutes);
@@ -85,6 +86,7 @@ app.use("/auth", authRoutes);
 app.use("/bots", botRoutes);
 app.use("/channels", channelRoutes);
 app.use("/business", businessRoutes);
+app.use("/products", productRoutes);
 app.use("/whatsapp", whatsappRoutes);
 
 // ---------------------
