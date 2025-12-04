@@ -10,14 +10,14 @@ export async function flowEngine(session, message) {
     const wantsYes = /(si|sí|ok|vale|claro|ya|dale)/i.test(text);
     const wantsNo = /(no|nah|nop)/i.test(text);
 
-    // ==============================================
-    //   OBTENER CATEGORÍAS DESDE PRODUCTOS
-    // ==============================================
     const allProducts = await Product.find().lean();
 
-    // si no tienes campo category, lo inferimos por nombre temporalmente
-    const productosPorCategoria = {};
+    // Si no hay productos → evitar errores
+    if (!allProducts.length) {
+        return "Por ahora no tengo productos disponibles 😕. Estoy actualizando mi catálogo.";
+    }
 
+    const productosPorCategoria = {};
     for (const p of allProducts) {
         const categoria = p.category ?? "general";
         if (!productosPorCategoria[categoria]) productosPorCategoria[categoria] = [];
@@ -26,14 +26,10 @@ export async function flowEngine(session, message) {
 
     const categorias = Object.keys(productosPorCategoria);
 
-    // ==============================================
-    //                FLUJO
-    // ==============================================
     switch (session.state) {
-
         case "saludo":
             session.state = "necesidad";
-            return `Hola 😊 ¿Qué estás buscando hoy?\nCategorías disponibles: ${categorias.join(", ")}`;
+            return `Hola 😊 ¿Qué estás buscando hoy? Categorías: ${categorias.join(", ")}`;
 
         case "necesidad": {
             const categoria = categorias.find(c => text.includes(c.toLowerCase()));
@@ -53,10 +49,7 @@ export async function flowEngine(session, message) {
         }
 
         case "producto_lista": {
-            const all = allProducts;
-
-            // buscar coincidencia por nombre
-            const productoObj = all.find(p =>
+            const productoObj = allProducts.find(p =>
                 text.includes(p.name.toLowerCase())
             );
 
@@ -67,10 +60,9 @@ export async function flowEngine(session, message) {
 
                 session.state = "confirmar_detalle";
 
-                return `Perfecto. Ese modelo cuesta ${productoObj.price.toLocaleString("es-CL")} CLP.\n¿Deseas agregar color, modelo o alguna variante?`;
+                return `Perfecto. Ese modelo cuesta ${productoObj.price.toLocaleString("es-CL")} CLP.\n¿Deseas agregar detalles o variantes?`;
             }
 
-            // fallback: texto libre
             if (message.length < 40) {
                 session.cart.producto = message;
                 session.cart.precio = 0;
@@ -91,7 +83,7 @@ export async function flowEngine(session, message) {
                 ? `${session.cart.precio.toLocaleString("es-CL")} CLP`
                 : "por confirmar";
 
-            return `Listo 👍\nProducto: ${session.cart.producto}\nPrecio: ${precio}\n¿Confirmamos la compra?`;
+            return `Listo 👍 Producto: ${session.cart.producto}\nPrecio: ${precio}\n¿Confirmamos la compra?`;
 
         case "confirmar_compra":
             if (wantsYes) {
@@ -100,7 +92,7 @@ export async function flowEngine(session, message) {
                 const total = session.cart.precio || 0;
                 const url = `https://tusitio.com/pagar?producto=${encodeURIComponent(session.cart.producto)}&monto=${total}`;
 
-                return `¡Perfecto! 🎉\nTotal a pagar: ${total.toLocaleString("es-CL")} CLP.\nAquí tienes tu link de pago:\n${url}`;
+                return `¡Perfecto! 🎉 Total: ${total.toLocaleString("es-CL")} CLP.\nAquí tienes tu link de pago:\n${url}`;
             }
 
             if (wantsNo) {

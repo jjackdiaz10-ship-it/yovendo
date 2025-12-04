@@ -9,13 +9,20 @@ export async function generateAIResponse(phone, message) {
     // historial
     session.history.push({ role: "user", content: message });
 
-    // flujo principal
-    const flowReply = flowEngine(session, message);
+    // Ejecutar flujo (ANTES FALTABA EL await)
+    const flowReply = await flowEngine(session, message);
 
-    // optimización por IA, pero controlada
+    // Si flowEngine devolvió algo vacío o raro → fallback
+    if (!flowReply || typeof flowReply !== "string") {
+        saveSession(phone, session);
+        return "Hubo un pequeño error procesando tu mensaje, ¿podrías repetirlo? 🙏";
+    }
+
+    // Mejorar estilo, pero sin modificar lógica
     let improvedReply = flowReply;
+
     try {
-        improvedReply = await askGroq(`
+        const aiResult = await askGroq(`
 Pulir texto para WhatsApp. Reglas:
 - Mantén la intención EXACTA del mensaje.
 - No agregues ofertas, ventas adicionales ni recomendaciones nuevas.
@@ -28,16 +35,16 @@ Texto:
 "${flowReply}"
 
 Devuelve SOLO el texto pulido.
-        `).catch(() => flowReply);
+        `);
 
-        if (!improvedReply || improvedReply.trim().length < 2) {
-            improvedReply = flowReply;
+        if (aiResult && typeof aiResult === "string" && aiResult.trim().length > 1) {
+            improvedReply = aiResult.trim();
         }
     } catch {
         improvedReply = flowReply;
     }
 
-    // guardar en historial
+    // guardar sesión
     session.history.push({ role: "assistant", content: improvedReply });
     saveSession(phone, session);
 

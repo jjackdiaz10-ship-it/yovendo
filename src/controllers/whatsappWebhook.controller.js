@@ -52,7 +52,7 @@ export async function receiveMessage(req, res) {
             direction: "in"
         });
 
-        //await sendWhatsAppText(from, aiReply);
+        await sendWhatsAppText(from, aiReply);
 
         return res.sendStatus(200);
 
